@@ -37,7 +37,7 @@ but then explicit build type (`--is` or configuration variable) may be required.
 ### Configuration
 
 Every project should contain a `build++.lsd` configuration file in the LSD file format (*TBD*).
-It consists of 4 sections:
+It consists of 4 sections (also see `example.build++.lsd`):
 
 - Metadata, like `name` and `version`, optionally `run` command.
 - Dependencies, be it other Build++ projects, compiled libraries or something else.
@@ -49,7 +49,7 @@ It consists of 4 sections:
 
 ```lsd
 name project-name      # required
-version 0.1.0          # required, `0.1.0` is done by 
+version 0.1.0          # required, `0.1.0` is done by `buildpp new`
 
 run mpiexec -n 16 {}   # optional,
                        # use `{}` to substitute executable file path
@@ -134,7 +134,7 @@ Currently supported types:
 
 > ⚠️ If MSVC complains with `No such file or directory` on one of the standard library's headers,
     try running [`vcvars64`](https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170#developer_command_file_locations)
-    in the current command prompt before using Build++.
+    in the current command prompt before using Build++. Not all shells support `vcvars64`.
 
 ```lsd
 profile {
