@@ -1,0 +1,42 @@
+# force comma
+match_block_trailing_comma = true
+
+# always chain
+chain_width = 0
+
+# preferably short
+fn_call_width = 30
+
+# force `x: x` -> `x`
+use_field_init_shorthand = true
+
+# keep | for complex match arms
+match_arm_leading_pipes = "Preserve"
+
+single_line_let_else_max_width = 100
+
+
+
+# requires `rustup toolchain install nightly`
+# and `+nightly` arg when running rustfmt
+unstable_features = true
+
+# force (_, _) -> (..)
+condense_wildcard_suffixes = true
+
+# always newline the } when {}...
+empty_item_single_line = false
+
+# ...but always { ... } fns
+fn_single_line = true
+
+# always remove {} from singular match =>
+match_arm_blocks = false
+
+# always flatten imports
+imports_granularity = "Item"
+
+# group imports in 3 chunks
+group_imports = "StdExternalCrate"
+
+brace_style = "PreferSameLine"
