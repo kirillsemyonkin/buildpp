@@ -13,20 +13,21 @@ Then, you may install (and update) directly from this repository using following
 cargo install --git https://github.com/kirillsemyonkin/buildpp
 ```
 
-If installed successfully, with a proper Rust setup, it should automatically appear in your `PATH`,
-you can check it using the following command:
+If installed successfully, with a proper Rust setup, it should automatically appear in your `PATH`
+environment variable, you can check if it works using the following command:
 
 ```sh
 buildpp --version
 ```
 
-If not working, try selecting installation path using Cargo's `--root ...` flag and adding that to
-the `PATH` environment variable manually.
+If that command is not found, try selecting installation path using Cargo's `--root ...` flag and
+adding that to the `PATH` environment variable manually.
 
 ## Usage
 
-Build++ requires a `build++.lsd` configuration and `src` directory. As projects build, they generate
-`cache` (dependencies) and `target` (output) directories, with `<version>/<profile>` structure.
+Build++ requires a `build++.lsd` configuration file and `src` directory. As projects build, they
+generate `cache` (dependencies) and `target` (output) directories, with a `.../<version>/<profile>`
+structure.
 
 Source directory has to contain either `main.cpp` file for `binary` projects and / or `lib.cpp` for
 static or shared library projects. This file will have to include all headers in your project.
@@ -101,7 +102,7 @@ dependency {
 
 Types that will be added in future:
 
-- [ ] Git-stored build++ project: `git build++` (`git buildpp`, `git build`, `git`).
+- [ ] Git-stored Build++ project: `git build++` (`git buildpp`, `git build`, `git`).
 - [ ] Downloadable compiled library: `remote pair` (`remote include`, `remote library`).
 - Also add more optional values may be added in the future to current types.
 
@@ -176,7 +177,7 @@ Types that will be added in future:
 
 ### Commands
 
-Use following commands to use Build++ (flags may start with `--`, `-` or `/`):
+Use following commands to interact with Build++ (flags may start with `--`, `-` or `/`):
 
 ```sh
 buildpp --version       # show version
@@ -188,8 +189,8 @@ buildpp build           # build the project into `target` directory
     --profile default   # optional, profile name (default is `default`)
 
 buildpp run             # build and run the program
-    -- args...          # optional, additional arguments to pass to the running program
     --profile default   # optional, profile name (default is `default`)
+    -- args...          # optional, additional arguments to pass to the running program
 
 buildpp new             # create project with `build++.lsd` and `src` hello world program
     --is binary         # required, supported: `binary` (main.cpp) or `library` (lib.cpp)
