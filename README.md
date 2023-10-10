@@ -35,6 +35,23 @@ static or shared library projects. This file will have to include all headers in
 > *Specifying custom entry source file may be added in future,
 but then explicit build type (`--is` or configuration variable) may be required.*
 
+Example of a project file structure:
+
+```tree
+│ # generated
+├── target
+│   └── 0.1.0/default
+│       ├── artifact/project-name.exe | artifact/project-name.dll | ...
+│       └── include/some-header-copied-from-src.h | ...
+├── cache
+│   └── dep-alias/0.1.0/default/...
+│
+│ # required
+├── src
+│   └── main.cpp | lib.cpp
+└── build++.lsd
+```
+
 ### Configuration
 
 Every project should contain a `build++.lsd` configuration file in the LSD file format (*TBD*).
