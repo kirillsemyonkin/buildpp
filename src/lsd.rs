@@ -48,6 +48,8 @@ pub enum LSDParseError {
 
     KeyCollisionValueWhenShouldBeLevel,
     KeyCollisionValueAlreadyExists(Value),
+
+    ExpectedKeyContinuation,
 }
 
 impl From<io::Error> for LSDParseError {
@@ -119,7 +121,7 @@ fn merge_level(insert_into: &mut Level, level: Level) -> Result<(), LSDParseErro
     return Ok(());
 }
 
-fn as_level(key_parts: Vec<&str>, value: LSD) -> Level {
+fn as_level(key_parts: Vec<String>, value: LSD) -> Level {
     let mut result = Level::new();
     let mut insert_into = &mut result;
 
@@ -127,12 +129,15 @@ fn as_level(key_parts: Vec<&str>, value: LSD) -> Level {
         .iter()
         .enumerate()
     {
+        let key_part = key_part
+            .as_str()
+            .into();
         if key_parts.len() - 1 == i {
-            insert_into.insert((*key_part).into(), value);
+            insert_into.insert(key_part, value);
             return result;
         } else {
             insert_into = match result
-                .entry((*key_part).into())
+                .entry(key_part)
                 .or_insert_with(|| LSD::Level(Level::default()))
             {
                 LSD::Value(_) => unreachable!(),
@@ -153,7 +158,8 @@ fn parse_level_inner<'a, S: Read>(
 
     let mut results = IndexMap::default();
     loop {
-        let Some(key_first_char) = read_filled(reader)? else {
+        let mut key = Vec::new();
+        let Some(mut key_first_char) = read_filled(reader)? else {
             return if level_ends_with_close {
                 // wanted a `}`, got eof
                 Err(UnexpectedLevelEnd)
@@ -163,42 +169,58 @@ fn parse_level_inner<'a, S: Read>(
             };
         };
 
-        // check if level ended
-        if key_first_char == '}' {
-            return if !level_ends_with_close {
-                // found an unwanted `}`
-                Err(UnexpectedLevelEnd)
-            } else {
-                // properly ended with a `}<eof>` or `}<whitespace>\n`
-                Ok(results.into())
+        loop {
+            // check if level ended
+            if key_first_char == '}' {
+                return if !level_ends_with_close {
+                    // found an unwanted `}`
+                    Err(UnexpectedLevelEnd)
+                } else {
+                    // properly ended with a `}<eof>` or `}<whitespace>\n`
+                    Ok(results.into())
+                };
+            }
+
+            // check if list ended here somehow
+            if key_first_char == ']' {
+                return Err(UnexpectedListEnd);
+            }
+
+            // read `"key with spaces"` or `key` until period
+            let ending_char = match key_first_char {
+                '"' | '\'' => {
+                    key.push(parse_string(
+                        reader,
+                        key_first_char,
+                    )?);
+                    read(reader)?
+                },
+                _ => {
+                    let (ending_char, word) = read_until_pattern(reader, buf, |c| {
+                        c.is_whitespace() || c == '.'
+                    })?;
+                    key.push(format!(
+                        "{}{}",
+                        key_first_char, word
+                    ));
+                    ending_char
+                },
             };
+
+            if ending_char != Some('.') {
+                break;
+            }
+
+            key_first_char = read(reader)?.ok_or(ExpectedKeyContinuation)?;
         }
 
-        // check if list ended here somehow
-        if key_first_char == ']' {
-            return Err(UnexpectedListEnd);
-        }
-
-        // read `"key with spaces"` or `key`
-        let key = match key_first_char {
-            '"' | '\'' => parse_string(reader, key_first_char)?,
-            _ => {
-                format!(
-                    "{}{}",
-                    key_first_char,
-                    read_until_whitespace(reader, buf)?
-                )
-            },
-        };
-
-        let value = parse_value(reader, buf, true)?;
-        let level = as_level(
-            key.split('.')
-                .collect(),
-            value,
-        );
-
-        merge_level(&mut results, level)?;
+        merge_level(
+            &mut results,
+            as_level(
+                key,
+                parse_value(reader, buf, true)?,
+            ),
+        )?;
     }
 }
 
@@ -387,6 +409,22 @@ fn read_filled<'a, S: Read>(reader: &mut BufReader<S>) -> Result<Option<char>, i
         };
         if !first_char.is_whitespace() {
             return Ok(Some(first_char));
+        }
+    }
+}
+
+fn read_until_pattern<'a, S: Read>(
+    reader: &mut BufReader<S>,
+    buf: &'a mut String,
+    pattern: impl Fn(char) -> bool,
+) -> Result<(Option<char>, &'a str), io::Error> {
+    buf.clear();
+    loop {
+        let char = reader.read_char()?;
+        match char {
+            Some(c) if pattern(c) => return Ok((Some(c), buf)),
+            Some(c) => buf.push(c),
+            None => return Ok((None, buf)),
         }
     }
 }
