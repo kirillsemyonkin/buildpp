@@ -4,8 +4,8 @@ version 0.1.0
 dependency {
     msmpi {
         is local pair
-        include D:/Program Files (x86)/Microsoft SDKs/MPI/Include
-        library D:/Program Files (x86)/Microsoft SDKs/MPI/Lib/x64
+        include C:/Program Files (x86)/Microsoft SDKs/MPI/Include
+        library C:/Program Files (x86)/Microsoft SDKs/MPI/Lib/x64
     }
 }
 

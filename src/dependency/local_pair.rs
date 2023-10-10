@@ -80,7 +80,11 @@ impl super::Dependency for Dependency {
         Ok("".into())
     }
 
-    fn needs_recaching(&self, cache_dep_dir: Dir) -> Result<bool, io::Error> {
+    fn needs_recaching(
+        &self,
+        _selected_profile: &str,
+        cache_dep_dir: Dir,
+    ) -> Result<bool, io::Error> {
         Ok(
             last_modified_recursive(cache_dep_dir)?
                 < Ord::max(

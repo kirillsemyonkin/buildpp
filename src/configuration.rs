@@ -270,7 +270,11 @@ impl Configuration {
             .replace(
                 "{}", // TODO do not touch {{}}
                 &self
-                    .target_artifact_file(BuildType::Binary, profile_name, profile)
+                    .target_artifact_file(
+                        BuildType::Binary,
+                        profile_name,
+                        profile,
+                    )
                     .display()
                     .to_string(),
             )
@@ -286,7 +290,11 @@ impl Configuration {
                         arg.replace(
                             "{}", // TODO do not touch {{}}
                             &self
-                                .target_artifact_file(BuildType::Binary, profile_name, profile)
+                                .target_artifact_file(
+                                    BuildType::Binary,
+                                    profile_name,
+                                    profile,
+                                )
                                 .display()
                                 .to_string(),
                         )
@@ -412,6 +420,7 @@ impl Configuration {
         &self,
         build_type: Option<BuildType>,
         profile_name: &str,
+        force_rebuild: bool,
     ) -> Result<&dyn Profile, BuildError> {
         use BuildError::*;
         use BuildType::*;
@@ -463,7 +472,10 @@ impl Configuration {
 
             if cache_dep_dir.is_dir()
                 && !dep
-                    .needs_recaching(cache_dep_dir.clone())
+                    .needs_recaching(
+                        &current_profile,
+                        cache_dep_dir.clone(),
+                    )
                     .map_err(Rc::new)
                     .map_err(CacheCouldNotCheckIfNeedsRecaching)?
             {
@@ -501,7 +513,8 @@ impl Configuration {
 
         // ensure needs a rebuild
         let target_dir = self.target_dir(&profile_name);
-        if !any_recached
+        if !force_rebuild
+            && !any_recached
             && target_dir.is_dir()
             && last_modified_recursive(target_dir)
                 .map_err(Rc::new)
@@ -645,6 +658,7 @@ impl Configuration {
         let profile = self.build(
             Some(BuildType::Binary),
             &profile_name,
+            false,
         )?;
 
         // then run
