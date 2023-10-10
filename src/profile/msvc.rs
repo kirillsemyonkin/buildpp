@@ -237,8 +237,8 @@ impl super::Profile for Profile {
         match build_type {
             Binary => ".exe",
             Library => match self.library_type {
-                Shared => ".lib",
-                Static => ".dll",
+                Shared => ".dll",
+                Static => ".lib",
             },
         }
     }

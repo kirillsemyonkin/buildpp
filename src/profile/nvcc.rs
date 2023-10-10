@@ -254,8 +254,8 @@ impl super::Profile for Profile {
         match build_type {
             Binary => ".exe",
             Library => match self.library_type {
-                Shared => ".lib",
-                Static => ".dll",
+                Shared => ".dll",
+                Static => ".lib",
             },
         }
     }
@@ -276,8 +276,8 @@ impl super::Profile for Profile {
         match build_type {
             Binary => "",
             Library => match self.library_type {
-                Shared => ".a",
-                Static => ".so",
+                Shared => ".so",
+                Static => ".a",
             },
         }
     }
