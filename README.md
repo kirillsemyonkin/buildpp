@@ -213,5 +213,6 @@ Future command features:
 - Complete all features in every block in this document.
 - [ ] Make LSD be own project.
 - [ ] Add support for other languages (at least as libraries).
+- [ ] Add parallel compilation support.
 - [ ] Currently properly supported for Windows, make everything work for Linux.
 - [ ] Add tests.
