@@ -116,10 +116,17 @@ impl super::Dependency for Dependency {
         })
     }
 
-    fn needs_recaching(&self, cache_dep_dir: Dir) -> Result<bool, io::Error> {
-        Ok(
-            last_modified_recursive(cache_dep_dir)?
-                < Ord::max(
+    fn needs_recaching(
+        &self,
+        selected_profile: &str,
+        cache_dep_dir: Dir,
+    ) -> Result<bool, io::Error> {
+        let target_dir = self
+            .config
+            .target_dir(selected_profile);
+        Ok(!target_dir.is_dir()
+            || last_modified_recursive(cache_dep_dir)?
+                < [
                     last_modified_recursive(
                         &self
                             .config
@@ -130,8 +137,11 @@ impl super::Dependency for Dependency {
                             .config
                             .src_dir(),
                     )?,
-                ),
-        )
+                    last_modified_recursive(target_dir)?,
+                ]
+                .into_iter()
+                .max()
+                .unwrap())
     }
 
     fn cache(
@@ -145,6 +155,7 @@ impl super::Dependency for Dependency {
             .build(
                 Some(BuildType::Library),
                 selected_profile,
+                false,
             )?;
 
         // 2. copy over results (include -> include_dir, artifact -> lib_dir)

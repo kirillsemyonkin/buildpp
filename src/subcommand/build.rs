@@ -129,7 +129,11 @@ impl super::Subcommand for Subcommand {
         let config = Configuration::load(project_dir).map_err(CannotLoadConfiguration)?;
 
         config
-            .build(self.build_type, &self.profile)
+            .build(
+                self.build_type,
+                &self.profile,
+                true,
+            )
             .map_err(BuildError)?;
 
         Ok(())

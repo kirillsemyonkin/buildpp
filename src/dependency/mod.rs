@@ -137,7 +137,13 @@ pub trait Dependency {
     /// Default implementation is `false`,
     /// because per-version caches are supposed to be immutable.
     /// However, some dependencies may recache in some cases (ex. snapshots support).
-    fn needs_recaching(&self, _cache_dep_dir: Dir) -> Result<bool, io::Error> { Ok(false) }
+    fn needs_recaching(
+        &self,
+        _selected_profile: &str,
+        _cache_dep_dir: Dir,
+    ) -> Result<bool, io::Error> {
+        Ok(false)
+    }
 
     /// Download/Copy/Link version and pre-build it.
     ///
