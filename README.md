@@ -4,9 +4,7 @@ Build++ is a project builder that can simplify building projects in multitude of
 
 ## Installation
 
-[Installing Rust](https://www.rust-lang.org/tools/install) is required to install Build++.
-
-Then, you may install (and update) directly from this repository using following command:
+Install from this repository using Cargo ([Install Rust](https://www.rust-lang.org/tools/install) first):
 
 ```sh
 cargo install --git https://github.com/kirillsemyonkin/buildpp
